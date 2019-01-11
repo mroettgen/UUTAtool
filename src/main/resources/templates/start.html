@@ -13,48 +13,55 @@
 
 <body>
 <div class="container mt-5">
-    <div id="tweet-preview">
+    <h1 class="display-4">UUTA Sentiment-Tool</h1>
+    <p class="lead">Weil ein Algorithmus manchmal nicht reicht</p>
+    <hr>
+
+    <div id="tweet-preview" class="bg-light mt-2 mb-2">
         <div id=tweet>
             <blockquote class="blockquote">
+                <!--@formatter:off-->
                 <p id="tweet-text" class="mb-0">Im Übrigen bin ich der Meinung, dass Karthago zerstört werden muss</p>
-                <footer class="blockquote-footer"><span id="user-name">Cato der Ältere</span> als <cite id="user-handle"
-                                                                                               title="Source Title">Toller
-                    Roemerboi815</cite>, <span id="tweet-date">158 v. Chr.</span></footer>
+                <footer class="blockquote-footer"><span id="user-name">Cato der Ältere</span> als
+                    <cite id="user-handle" title="Source Title"> Roemerboi815</cite>,
+                    <span id="tweet-date">158 v. Chr.</span>
+                </footer>
+                <!--@formatter:on-->
             </blockquote>
-
-
-            <span></span>
-            <span class="lead"></span>
         </div>
-        <div id=sentim-buttons>
+    </div>
+
+    <div id="pbar" class="progress">
+        <div class="progress-bar" role="progressbar">0
+        </div>
+    </div>
+    <div class="d-flex justify-content-center">
+        <div id="sentim-buttons" class="mt-3">
             <button id="sentim-neg-btn" class="btn btn-danger"><i class="fas fa-arrow-left"></i></button>
             <button id="sentim-equ-btn" class="btn btn-secondary"><i class="fas fa-arrow-down"></i></button>
             <button id="sentim-pos-btn" class="btn btn-success"><i class="fas fa-arrow-right"></i></button>
         </div>
+    </div>
 
-        <form class="w-50" id="file-select">
-            <h3>Konfiguration:</h3>
-            <div class="form-group">
-                <div class="input-group">
-                    <div class="input-group-prepend">
-                        <span class="input-group-text">Zahl der zu prüfenden Tweets:</span>
-                    </div>
-                    <input id="count" class="form-control" type="number" value="1"></input>
+    <form class="w-50 mt-2" id="file-select">
+        <h3>Konfiguration:</h3>
+        <div class="form-group">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Zahl der zu prüfenden Tweets:</span>
                 </div>
-                <div class="custom-file">
-                    <input type="file" class="custom-file-input" id="csv-input">
-                    <label class="custom-file-label" for="csv-input">Hier klicken und CSV-Datei auswählen</label>
-                </div>
+                <input id="count" class="form-control" type="number" value="100"></input>
             </div>
-            <button class="btn btn-primary" type="submit">Los</button>
-        </form>
-
-
-        <div id="pbar" class="progress">
-            <div class="progress-bar" role="progressbar">0
+            <div class="custom-file">
+                <input type="file" class="custom-file-input" id="csv-input" required>
+                <label class="custom-file-label" for="csv-input">Hier klicken und CSV-Datei auswählen</label>
             </div>
         </div>
+        <button class="btn btn-primary" type="submit">Los</button>
+    </form>
 
+    <div id="finish-container" class="mt-3">
+        <button id="download-btn" class="btn btn-primary" type="button">CSV Download</button>
     </div>
 
 </div>

@@ -2,40 +2,45 @@ $(document).ready(function () {
 
     $('#pbar').hide();
     $('#sentim-buttons').hide();
+    $('#finish-container').hide();
 
     $("#file-select").submit(function (e) {
-        e.preventDefault();
-        let thecsv = $('#csv-input').prop('files')[0];
-        console.log(thecsv);
-        Papa.parse(thecsv, {
-            delimiter: "", // auto-detect
-            newline: "", // auto-detect
-            quoteChar: '"',
-            escapeChar: '"',
-            header: true,
-            transformHeader: undefined,
-            dynamicTyping: false,
-            preview: 0,
-            encoding: "UTF-8",
-            worker: false,
-            comments: false,
-            step: undefined,
-            complete: doComplete,
-            error: undefined,
-            download: false,
-            skipEmptyLines: false,
-            chunk: undefined,
-            fastMode: undefined,
-            beforeFirstChunk: undefined,
-            withCredentials: undefined,
-            transform: undefined
-        });
+            e.preventDefault();
+            let thecsv = $('#csv-input').prop('files')[0];
+            if (thecsv != undefined) {
+                console.log(thecsv);
+                Papa.parse(thecsv, {
+                    delimiter: "", // auto-detect
+                    newline: "", // auto-detect
+                    quoteChar: '"',
+                    escapeChar: '"',
+                    header: true,
+                    transformHeader: undefined,
+                    dynamicTyping: false,
+                    preview: 0,
+                    encoding: "UTF-8",
+                    worker: false,
+                    comments: false,
+                    step: undefined,
+                    complete: doComplete,
+                    error: undefined,
+                    download: false,
+                    skipEmptyLines: false,
+                    chunk: undefined,
+                    fastMode: undefined,
+                    beforeFirstChunk: undefined,
+                    withCredentials: undefined,
+                    transform: undefined
+                });
 
-        $('#file-select').hide();
-        $('#pbar').show();
-        $('#sentim-buttons').show();
-    });
-
+                $('#file-select').hide();
+                $('#pbar').show();
+                $('#sentim-buttons').show();
+            } else {
+                alert("Du solltest noch die CSV-Datei auswählen...");
+            }
+        }
+    );
 });
 
 function doComplete(results, file) {
@@ -43,12 +48,10 @@ function doComplete(results, file) {
     let data = shuffle(results.data);
     let numberOfTweets = $('#count').val();
     console.log(numberOfTweets);
-    check(data, numberOfTweets, finish);
+    check(data, numberOfTweets);
 }
 
-function check(data, numberOfTweets = (Math.round(data.length / 3)), callback = function () {
-    return
-}, i = 0) {
+function check(data, numberOfTweets = (Math.round(data.length / 3)), i = 0) {
     console.log("Prüfe Tweet " + i + " von " + numberOfTweets + " Tweets...");
     let percentDone = Math.round((i / numberOfTweets) * 100);
     $('.progress-bar').css("width", percentDone + "%");
@@ -65,6 +68,7 @@ function check(data, numberOfTweets = (Math.round(data.length / 3)), callback = 
 
     if (i >= numberOfTweets) {
         clean();
+        finish(data);
         return
     }
 
@@ -79,16 +83,32 @@ function check(data, numberOfTweets = (Math.round(data.length / 3)), callback = 
     $('#tweet-date').text(entry.date);
     $('#tweet-text').text(entry.text);
 
+    /* Doppelter Code, aber idc https://i.redd.it/r9pw10m587v01.jpg */
+    $('#sentim-pos-btn').click(function(e) {
+        e.preventDefault();
+        entry.sentim_self = 1;
+        check(data, numberOfTweets, ++i);
+    });
+    $('#sentim-neg-btn').click(function(e) {
+        e.preventDefault();
+        entry.sentim_self = -1;
+        check(data, numberOfTweets, ++i);
+    });
+    $('#sentim-equ-btn').click(function(e) {
+        e.preventDefault();
+        entry.sentim_self = 0;
+        check(data, numberOfTweets, ++i);
+    });
     document.onkeyup = function (e) {
         if (e.key == "ArrowRight") {
-            entry.sentiment_self = 1;
-            check(data, numberOfTweets, callback, ++i);
+            entry.sentim_self = 1;
+            check(data, numberOfTweets, ++i);
         } else if (e.key == "ArrowLeft") {
-            entry.sentiment_self = -1;
-            check(data, numberOfTweets, callback, ++i);
+            entry.sentim_self = -1;
+            check(data, numberOfTweets, ++i);
         } else if (e.key == "ArrowDown") {
-            entry.sentiment_self = 0;
-            check(data, numberOfTweets, callback, ++i);
+            entry.sentim_self = 0;
+            check(data, numberOfTweets, ++i);
         }
     }
 
@@ -98,8 +118,23 @@ function clean() {
     $('#tweet').empty();
 }
 
-function finish() {
-    //TODO: Cooles Zeug anzeigen und vor allem die Ergebnisse zurück in die CSV speichern.
+function finish(data) {
+    let csv = Papa.unparse(data);
+
+    /* Event-Handler abschalten */
+    $('#sentim-equ-btn, #sentim-neg-btn, #sentim-pos-btn').off();
+    document.onkeyup = null;
+
+    $('#finish-container').click(function(e) {
+        e.preventDefault();
+        let hiddenElement = document.createElement('a');
+        hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);
+        hiddenElement.target = '_blank';
+        hiddenElement.download = 'custom_sentiment.csv';
+        hiddenElement.click();
+    });
+    $('#sentim-buttons').hide();
+    $('#finish-container').show();
 }
 
 
