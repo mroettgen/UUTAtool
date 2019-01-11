@@ -66,16 +66,18 @@ function check(data, numberOfTweets = (Math.round(data.length / 3)), i = 0) {
         console.log("Viel Spaß mit deinen " + numberOfTweets + " Tweets.")
     }
 
+    /* Wenn fertig, dann fertig */
     if (i >= numberOfTweets) {
-        clean();
         finish(data);
         return
     }
 
     let entry = data[i];
-    if (entry == null) {
-        clean();
-        return
+
+    /* undefined ist JS sei Dank == false */
+    if(entry.evaluated) {
+        Console.log("Tweet wurde bereits bewertet, überspringe...");
+        check(data, ++numberOfTweets, ++i);
     }
 
     $('#user-handle').text(entry.user_handle);
@@ -83,7 +85,8 @@ function check(data, numberOfTweets = (Math.round(data.length / 3)), i = 0) {
     $('#tweet-date').text(entry.date);
     $('#tweet-text').text(entry.text);
 
-    /* Doppelter Code, aber idc https://i.redd.it/r9pw10m587v01.jpg */
+    /* Doppelter Code, aber idc
+     * https://i.redd.it/r9pw10m587v01.jpg */
     $('#sentim-pos-btn').click(function(e) {
         e.preventDefault();
         entry.sentim_self = 1;
@@ -99,6 +102,8 @@ function check(data, numberOfTweets = (Math.round(data.length / 3)), i = 0) {
         entry.sentim_self = 0;
         check(data, numberOfTweets, ++i);
     });
+
+    /* Vermutlich geht das hier viel eleganter */
     document.onkeyup = function (e) {
         if (e.key == "ArrowRight") {
             entry.sentim_self = 1;
@@ -114,16 +119,8 @@ function check(data, numberOfTweets = (Math.round(data.length / 3)), i = 0) {
 
 }
 
-function clean() {
-    $('#tweet').empty();
-}
-
 function finish(data) {
     let csv = Papa.unparse(data);
-
-    /* Event-Handler abschalten */
-    $('#sentim-equ-btn, #sentim-neg-btn, #sentim-pos-btn').off();
-    document.onkeyup = null;
 
     $('#finish-container').click(function(e) {
         e.preventDefault();
@@ -133,6 +130,7 @@ function finish(data) {
         hiddenElement.download = 'custom_sentiment.csv';
         hiddenElement.click();
     });
+    $('#tweet').empty();
     $('#sentim-buttons').hide();
     $('#finish-container').show();
 }
